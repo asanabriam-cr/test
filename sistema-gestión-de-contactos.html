@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Contactos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #ffffff;
+            color: #333333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 32px;
+            font-weight: 300;
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .search-section {
+            margin-bottom: 40px;
+            text-align: center;
+        }
+
+        .search-container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 16px 24px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 24px;
+            outline: none;
+            transition: all 0.3s ease;
+            background-color: #fafafa;
+        }
+
+        .search-input:focus {
+            border-color: #1976d2;
+            background-color: #ffffff;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.1);
+        }
+
+        .controls {
+            margin-bottom: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: #1976d2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #1565c0;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #f5f5f5;
+            color: #666;
+            border: 1px solid #ddd;
+        }
+
+        .btn-secondary:hover {
+            background-color: #eeeeee;
+        }
+
+        .btn-danger {
+            background-color: #d32f2f;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c62828;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .stats {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-section {
+            background-color: #fafafa;
+            border-radius: 8px;
+            padding: 40px;
+            margin-bottom: 40px;
+            display: none;
+        }
+
+        .form-section.active {
+            display: block;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #555;
+            font-size: 14px;
+        }
+
+        input, select, textarea {
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+            background-color: white;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #1976d2;
+            box-shadow: 0 0 0 2px rgba(25, 118, 210, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-actions {
+            margin-top: 32px;
+            display: flex;
+            gap: 16px;
+            justify-content: flex-end;
+        }
+
+        .contacts-table {
+            background-color: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: 500;
+            color: #555;
+            font-size: 14px;
+        }
+
+        td {
+            font-size: 14px;
+        }
+
+        tr:hover {
+            background-color: #fafafa;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+
+        .no-results h3 {
+            margin-bottom: 16px;
+            font-weight: 400;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px 16px;
+            }
+
+            .header h1 {
+                font-size: 24px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-section {
+                padding: 24px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            .contacts-table {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 800px;
+            }
+
+            .actions {
+                flex-direction: column;
+            }
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 32px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .modal h3 {
+            margin-bottom: 16px;
+            font-weight: 400;
+        }
+
+        .modal-actions {
+            margin-top: 24px;
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Gestión de Contactos</h1>
+        </div>
+
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Buscar contactos...">
+            </div>
+        </div>
+
+        <div class="controls">
+            <div class="stats">
+                <span id="contactCount">0 contactos</span>
+            </div>
+            <button class="btn btn-primary" onclick="showAddForm()">+ Agregar Contacto</button>
+        </div>
+
+        <div class="form-section" id="formSection">
+            <h2 id="formTitle">Agregar Contacto</h2>
+            <form id="contactForm">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="cedula">Número de Cédula *</label>
+                        <input type="text" id="cedula" name="cedula" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="nombre">Nombre *</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="apellidos">Apellidos *</label>
+                        <input type="text" id="apellidos" name="apellidos" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fechaNacimiento">Fecha de Nacimiento</label>
+                        <input type="date" id="fechaNacimiento" name="fechaNacimiento">
+                    </div>
+                    <div class="form-group">
+                        <label for="nacionalidad">Nacionalidad</label>
+                        <input type="text" id="nacionalidad" name="nacionalidad">
+                    </div>
+                    <div class="form-group">
+                        <label for="telefono">Teléfono</label>
+                        <input type="tel" id="telefono" name="telefono" placeholder="8888-8888">
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Correo Electrónico</label>
+                        <input type="email" id="email" name="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="provincia">Provincia</label>
+                        <input type="text" id="provincia" name="provincia">
+                    </div>
+                    <div class="form-group">
+                        <label for="canton">Cantón</label>
+                        <input type="text" id="canton" name="canton">
+                    </div>
+                    <div class="form-group">
+                        <label for="distrito">Distrito</label>
+                        <input type="text" id="distrito" name="distrito">
+                    </div>
+                    <div class="form-group">
+                        <label for="cargo">Cargo</label>
+                        <input type="text" id="cargo" name="cargo">
+                    </div>
+                    <div class="form-group full-width">
+                        <label for="notas">Notas</label>
+                        <textarea id="notas" name="notas" placeholder="Información adicional..."></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="cancelForm()">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Guardar</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="contacts-table">
+            <div id="contactsList">
+                <div class="no-results">
+                    <h3>No hay contactos registrados</h3>
+                    <p>Agrega tu primer contacto usando el botón de arriba.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <h3>Confirmar eliminación</h3>
+            <p>¿Estás seguro de que deseas eliminar este contacto?</p>
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="closeDeleteModal()">Cancelar</button>
+                <button class="btn btn-danger" onclick="confirmDelete()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Estado de la aplicación
+        let contacts = [];
+        let editingIndex = -1;
+        let deleteIndex = -1;
+        let filteredContacts = [];
+
+        // Inicializar aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            updateContactsList();
+            updateStats();
+            
+            // Event listeners
+            document.getElementById('searchInput').addEventListener('input', handleSearch);
+            document.getElementById('contactForm').addEventListener('submit', handleSubmit);
+            document.getElementById('telefono').addEventListener('input', formatPhone);
+        });
+
+        // Mostrar formulario para agregar
+        function showAddForm() {
+            editingIndex = -1;
+            document.getElementById('formTitle').textContent = 'Agregar Contacto';
+            document.getElementById('submitBtn').textContent = 'Guardar';
+            document.getElementById('contactForm').reset();
+            document.getElementById('formSection').classList.add('active');
+            document.getElementById('cedula').focus();
+        }
+
+        // Mostrar formulario para editar
+        function editContact(index) {
+            const contact = filteredContacts[index];
+            const originalIndex = contacts.findIndex(c => c.cedula === contact.cedula);
+            editingIndex = originalIndex;
+            
+            document.getElementById('formTitle').textContent = 'Editar Contacto';
+            document.getElementById('submitBtn').textContent = 'Actualizar';
+            
+            // Llenar el formulario con los datos existentes
+            Object.keys(contact).forEach(key => {
+                const field = document.getElementById(key);
+                if (field) {
+                    field.value = contact[key] || '';
+                }
+            });
+            
+            document.getElementById('formSection').classList.add('active');
+            document.getElementById('nombre').focus();
+        }
+
+        // Cancelar formulario
+        function cancelForm() {
+            document.getElementById('formSection').classList.remove('active');
+            document.getElementById('contactForm').reset();
+            editingIndex = -1;
+        }
+
+        // Manejar envío del formulario
+        function handleSubmit(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(e.target);
+            const contact = {};
+            
+            // Construir objeto de contacto
+            for (let [key, value] of formData.entries()) {
+                contact[key] = value.trim();
+            }
+            
+            // Validaciones básicas
+            if (!contact.cedula || !contact.nombre || !contact.apellidos) {
+                alert('Por favor completa los campos obligatorios (Cédula, Nombre, Apellidos)');
+                return;
+            }
+            
+            // Verificar cédula duplicada (solo al agregar o si cambió la cédula)
+            const existingIndex = contacts.findIndex(c => c.cedula === contact.cedula);
+            if (editingIndex === -1 && existingIndex !== -1) {
+                alert('Ya existe un contacto con esa cédula');
+                return;
+            }
+            if (editingIndex !== -1 && existingIndex !== -1 && existingIndex !== editingIndex) {
+                alert('Ya existe un contacto con esa cédula');
+                return;
+            }
+            
+            // Agregar o actualizar contacto
+            if (editingIndex === -1) {
+                contacts.push(contact);
+            } else {
+                contacts[editingIndex] = contact;
+            }
+            
+            // Resetear y actualizar vista
+            cancelForm();
+            updateContactsList();
+            updateStats();
+            handleSearch(); // Reaplica el filtro actual
+        }
+
+        // Formatear teléfono
+        function formatPhone(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 4) {
+                value = value.substring(0, 4) + '-' + value.substring(4, 8);
+            }
+            e.target.value = value;
+        }
+
+        // Manejar búsqueda
+        function handleSearch() {
+            const query = document.getElementById('searchInput').value.toLowerCase().trim();
+            
+            if (!query) {
+                filteredContacts = [...contacts];
+            } else {
+                filteredContacts = contacts.filter(contact => {
+                    return Object.values(contact).some(value => 
+                        value && value.toString().toLowerCase().includes(query)
+                    );
+                });
+            }
+            
+            updateContactsList();
+        }
+
+        // Actualizar lista de contactos
+        function updateContactsList() {
+            const container = document.getElementById('contactsList');
+            
+            if (filteredContacts.length === 0) {
+                const query = document.getElementById('searchInput').value.trim();
+                if (query) {
+                    container.innerHTML = `
+                        <div class="no-results">
+                            <h3>No se encontraron resultados</h3>
+                            <p>No hay contactos que coincidan con "${query}"</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = `
+                        <div class="no-results">
+                            <h3>No hay contactos registrados</h3>
+                            <p>Agrega tu primer contacto usando el botón de arriba.</p>
+                        </div>
+                    `;
+                }
+                return;
+            }
+            
+            const table = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cédula</th>
+                            <th>Nombre Completo</th>
+                            <th>Teléfono</th>
+                            <th>Email</th>
+                            <th>Provincia</th>
+                            <th>Cargo</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${filteredContacts.map((contact, index) => `
+                            <tr>
+                                <td>${contact.cedula || ''}</td>
+                                <td>${(contact.nombre || '') + ' ' + (contact.apellidos || '')}</td>
+                                <td>${contact.telefono || ''}</td>
+                                <td>${contact.email || ''}</td>
+                                <td>${contact.provincia || ''}</td>
+                                <td>${contact.cargo || ''}</td>
+                                <td>
+                                    <div class="actions">
+                                        <button class="btn btn-secondary btn-small" onclick="editContact(${index})">Editar</button>
+                                        <button class="btn btn-danger btn-small" onclick="showDeleteModal(${index})">Eliminar</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            container.innerHTML = table;
+        }
+
+        // Actualizar estadísticas
+        function updateStats() {
+            const count = contacts.length;
+            const countText = count === 1 ? '1 contacto' : `${count} contactos`;
+            document.getElementById('contactCount').textContent = countText;
+        }
+
+        // Mostrar modal de eliminación
+        function showDeleteModal(index) {
+            deleteIndex = index;
+            document.getElementById('deleteModal').style.display = 'block';
+        }
+
+        // Cerrar modal de eliminación
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+            deleteIndex = -1;
+        }
+
+        // Confirmar eliminación
+        function confirmDelete() {
+            if (deleteIndex !== -1) {
+                const contact = filteredContacts[deleteIndex];
+                const originalIndex = contacts.findIndex(c => c.cedula === contact.cedula);
+                contacts.splice(originalIndex, 1);
+                
+                updateContactsList();
+                updateStats();
+                handleSearch(); // Reaplica el filtro actual
+            }
+            closeDeleteModal();
+        }
+
+        // Cerrar modal al hacer clic fuera
+        window.onclick = function(event) {
+            const modal = document.getElementById('deleteModal');
+            if (event.target === modal) {
+                closeDeleteModal();
+            }
+        }
+
+        // Inicializar con filteredContacts vacío
+        filteredContacts = [...contacts];
+    </script>
+</body>
+</html>
